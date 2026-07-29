@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OverviewRouteImport } from './routes/overview'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as GoalGoalIdRouteImport } from './routes/goal.$goalId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OverviewRoute = OverviewRouteImport.update({
+  id: '/overview',
+  path: '/overview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgressRoute = ProgressRouteImport.update({
@@ -31,30 +37,34 @@ const GoalGoalIdRoute = GoalGoalIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/overview': typeof OverviewRoute
   '/progress': typeof ProgressRoute
   '/goal/$goalId': typeof GoalGoalIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/overview': typeof OverviewRoute
   '/progress': typeof ProgressRoute
   '/goal/$goalId': typeof GoalGoalIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/overview': typeof OverviewRoute
   '/progress': typeof ProgressRoute
   '/goal/$goalId': typeof GoalGoalIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/progress' | '/goal/$goalId'
+  fullPaths: '/' | '/overview' | '/progress' | '/goal/$goalId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/progress' | '/goal/$goalId'
-  id: '__root__' | '/' | '/progress' | '/goal/$goalId'
+  to: '/' | '/overview' | '/progress' | '/goal/$goalId'
+  id: '__root__' | '/' | '/overview' | '/progress' | '/goal/$goalId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OverviewRoute: typeof OverviewRoute
   ProgressRoute: typeof ProgressRoute
   GoalGoalIdRoute: typeof GoalGoalIdRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/overview': {
+      id: '/overview'
+      path: '/overview'
+      fullPath: '/overview'
+      preLoaderRoute: typeof OverviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progress': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OverviewRoute: OverviewRoute,
   ProgressRoute: ProgressRoute,
   GoalGoalIdRoute: GoalGoalIdRoute,
 }

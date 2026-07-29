@@ -27,6 +27,13 @@ function RootComponent() {
               Chart
             </Link>
             <Link
+              to="/overview"
+              className="text-sm text-neutral-600 hover:text-neutral-950"
+              activeProps={{ className: 'font-medium text-neutral-950' }}
+            >
+              Overview
+            </Link>
+            <Link
               to="/progress"
               className="text-sm text-neutral-600 hover:text-neutral-950"
               activeProps={{ className: 'font-medium text-neutral-950' }}
