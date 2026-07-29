@@ -39,7 +39,7 @@ function OverviewPage() {
       </p>
 
       <div className="mt-8 overflow-x-auto">
-        <div className="grid min-w-[44rem] grid-cols-3 gap-1.5">
+        <div className="grid min-w-[44rem] grid-cols-3 gap-(--padding) rounded-(--radius) bg-neutral-50 p-(--padding) [--padding:--spacing(1.5)] [--radius:var(--radius-2xl)]">
           {RING.map((blockIndex) =>
             blockIndex === -1 ? (
               <CenterBlock key="center" plan={plan} />
@@ -68,7 +68,7 @@ const CELL =
 
 function CenterBlock({ plan }: { plan: Plan }) {
   return (
-    <div className="grid grid-cols-3 gap-px overflow-hidden rounded-lg bg-neutral-950/10 ring-1 ring-neutral-950/10">
+    <div className="grid grid-cols-3 gap-px overflow-hidden rounded-[calc(var(--radius)-var(--padding))] bg-neutral-950/10 ring-1 ring-neutral-950/10">
       {RING.map((areaIndex) =>
         areaIndex === -1 ? (
           <div
@@ -92,7 +92,7 @@ function CenterBlock({ plan }: { plan: Plan }) {
 function GoalBlock({ areaIndex, area }: { areaIndex: number; area: Area }) {
   let actionCursor = 0
   return (
-    <div className="grid grid-cols-3 gap-px overflow-hidden rounded-lg bg-neutral-950/10 ring-1 ring-neutral-950/10">
+    <div className="grid grid-cols-3 gap-px overflow-hidden rounded-[calc(var(--radius)-var(--padding))] bg-neutral-950/10 ring-1 ring-neutral-950/10">
       {RING.map((position) => {
         if (position === -1) {
           return (
