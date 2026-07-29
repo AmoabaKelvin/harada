@@ -8,6 +8,8 @@ import {
 } from '../lib/plan'
 
 export const Route = createFileRoute('/goal/$goalId')({
+  validateSearch: (search: Record<string, unknown>): { from?: 'overview' } =>
+    search.from === 'overview' ? { from: 'overview' } : {},
   beforeLoad: ({ params }) => {
     const id = Number(params.goalId)
     if (!Number.isInteger(id) || id < 1 || id > 8) {
@@ -19,6 +21,7 @@ export const Route = createFileRoute('/goal/$goalId')({
 
 function GoalPage() {
   const { goalId } = Route.useParams()
+  const { from } = Route.useSearch()
   const plan = usePlan()
   const areaIndex = Number(goalId) - 1
   const area = plan.areas[areaIndex]
@@ -27,11 +30,11 @@ function GoalPage() {
   return (
     <div className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
       <Link
-        to="/"
+        to={from === 'overview' ? '/overview' : '/'}
         className="inline-flex items-center gap-1 text-sm font-medium text-neutral-600 hover:text-neutral-950"
       >
         <ChevronLeftIcon className="size-4 shrink-0 fill-neutral-400" />
-        Back to chart
+        {from === 'overview' ? 'Back to Open Window 64' : 'Back to chart'}
       </Link>
 
       <p className="mt-8 text-sm font-medium text-blue-600 tabular-nums">

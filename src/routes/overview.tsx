@@ -133,6 +133,7 @@ function GoalTitleCell({
     <Link
       to="/goal/$goalId"
       params={{ goalId: String(areaIndex + 1) }}
+      search={{ from: 'overview' }}
       className={`${CELL} bg-neutral-100 hover:bg-neutral-200/70 focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-blue-600 ${
         title ? 'font-medium' : 'text-neutral-400'
       }`}
