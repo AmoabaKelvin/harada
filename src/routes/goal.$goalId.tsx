@@ -1,6 +1,7 @@
 import { Link, createFileRoute, redirect } from '@tanstack/react-router'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import {
+  setActionKind,
   setActionText,
   setAreaTitle,
   toggleAction,
@@ -65,8 +66,8 @@ function GoalPage() {
         </p>
       </div>
       <p className="mt-1 text-sm text-pretty text-neutral-500">
-        Eight small, concrete things you can act on. Check them off as you do
-        them.
+        Eight small, concrete things you can act on. Mark the recurring ones as
+        routines — they reset every morning; one-time actions stay done.
       </p>
 
       <ul role="list" className="mt-4 divide-y divide-neutral-950/5">
@@ -120,6 +121,29 @@ function GoalPage() {
                 action.done ? 'text-neutral-400 line-through' : ''
               }`}
             />
+            <button
+              type="button"
+              onClick={() =>
+                setActionKind(
+                  areaIndex,
+                  actionIndex,
+                  action.kind === 'routine' ? 'once' : 'routine',
+                )
+              }
+              disabled={!action.text.trim()}
+              aria-label={
+                action.kind === 'routine'
+                  ? `Make action ${actionIndex + 1} one-time`
+                  : `Make action ${actionIndex + 1} a daily routine`
+              }
+              className={`w-16 shrink-0 rounded-full px-2 py-1 text-center text-xs font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-40 ${
+                action.kind === 'routine'
+                  ? 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                  : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200/70'
+              }`}
+            >
+              {action.kind === 'routine' ? 'Routine' : 'Once'}
+            </button>
           </li>
         ))}
       </ul>

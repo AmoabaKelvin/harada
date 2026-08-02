@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { CheckIcon } from '@heroicons/react/16/solid'
-import { planStats, usePlan } from '../lib/plan'
+import { planStats, routineStats, toggleAction, usePlan } from '../lib/plan'
 
 export const Route = createFileRoute('/progress')({ component: ProgressPage })
 
@@ -28,6 +28,19 @@ function ProgressPage() {
 
   const { planned, done } = planStats(plan)
   const percent = planned === 0 ? 0 : Math.round((done / planned) * 100)
+
+  const routines = routineStats(plan)
+  const todayRoutines = plan.areas.flatMap((area, areaIndex) =>
+    area.actions
+      .map((action, actionIndex) => ({ action, areaIndex, actionIndex }))
+      .filter(
+        ({ action }) => action.kind === 'routine' && action.text.trim(),
+      )
+      .map((item) => ({
+        ...item,
+        goalTitle: area.title || `Goal ${areaIndex + 1}`,
+      })),
+  )
 
   const completed = plan.areas
     .flatMap((area, areaIndex) =>
@@ -65,6 +78,77 @@ function ProgressPage() {
           <p className="mt-1 text-2xl font-semibold tabular-nums">{percent}%</p>
         </div>
       </div>
+
+      <div className="mt-12 flex items-baseline justify-between gap-4">
+        <h2 className="text-base font-semibold">Routine check</h2>
+        {routines.routines > 0 && (
+          <p className="text-sm text-neutral-500 tabular-nums">
+            {routines.doneToday} of {routines.routines} today
+          </p>
+        )}
+      </div>
+      {routines.routines === 0 ? (
+        <p className="mt-3 text-sm text-pretty text-neutral-500">
+          No routines yet. On a goal page, mark a recurring action as a routine
+          — it resets each morning, and your daily success rate shows up here.
+        </p>
+      ) : (
+        <>
+          <div className="mt-4 grid grid-cols-3">
+            <div className="pr-4">
+              <p className="truncate text-sm text-neutral-500">Today</p>
+              <p className="mt-1 text-2xl font-semibold tabular-nums">
+                {Math.round((routines.todayRate ?? 0) * 100)}%
+              </p>
+            </div>
+            {routines.windows.map((window) => (
+              <div
+                key={window.days}
+                className="border-l border-neutral-950/10 px-4 last:pl-4 last:pr-0"
+              >
+                <p className="truncate text-sm text-neutral-500">
+                  {window.days}-day
+                </p>
+                <p className="mt-1 text-2xl font-semibold tabular-nums">
+                  {window.rate === null ? '—' : `${Math.round(window.rate * 100)}%`}
+                </p>
+                {window.daysCounted < window.days && (
+                  <p className="mt-0.5 truncate text-xs text-neutral-400 tabular-nums">
+                    {window.daysCounted}{' '}
+                    {window.daysCounted === 1 ? 'day' : 'days'} tracked
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-sm text-pretty text-neutral-500">
+            The aim is consistency, not perfection — keep the 30- and 60-day
+            rates at 90% or better.
+          </p>
+          <ul role="list" className="mt-4 divide-y divide-neutral-950/5">
+            {todayRoutines.map(({ action, areaIndex, actionIndex, goalTitle }) => (
+              <li
+                key={`${areaIndex}-${actionIndex}`}
+                className="flex items-center gap-3 py-2 text-sm"
+              >
+                <input
+                  type="checkbox"
+                  aria-label={`Mark “${action.text}” done today`}
+                  checked={action.done}
+                  onChange={() => toggleAction(areaIndex, actionIndex)}
+                  className="size-4 shrink-0 accent-blue-600"
+                />
+                <p className={action.done ? 'text-neutral-400 line-through' : ''}>
+                  {action.text}
+                </p>
+                <p className="ml-auto shrink-0 text-xs text-neutral-500">
+                  {goalTitle}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       <h2 className="mt-12 text-base font-semibold">By goal</h2>
       <div className="mt-4 flex flex-col gap-5">
