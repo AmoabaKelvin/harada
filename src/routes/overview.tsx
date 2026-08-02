@@ -1,4 +1,7 @@
+import { useRef, useState } from 'react'
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { ArrowDownTrayIcon } from '@heroicons/react/16/solid'
+import { toPng } from 'html-to-image'
 import { planStats, usePlan } from '../lib/plan'
 import type { Area, Plan } from '../lib/plan'
 
@@ -9,6 +12,25 @@ const RING = [0, 1, 2, 3, -1, 4, 5, 6, 7]
 
 function OverviewPage() {
   const plan = usePlan()
+  const gridRef = useRef<HTMLDivElement>(null)
+  const [exporting, setExporting] = useState(false)
+
+  async function exportAsImage() {
+    if (!gridRef.current || exporting) return
+    setExporting(true)
+    try {
+      const dataUrl = await toPng(gridRef.current, {
+        pixelRatio: 2,
+        backgroundColor: '#ffffff',
+      })
+      const link = document.createElement('a')
+      link.download = 'open-window-64.png'
+      link.href = dataUrl
+      link.click()
+    } finally {
+      setExporting(false)
+    }
+  }
 
   if (!plan.ambition) {
     return (
@@ -33,13 +55,31 @@ function OverviewPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-      <h1 className="text-2xl font-semibold tracking-tight">Open Window 64</h1>
-      <p className="mt-1 max-w-[80ch] text-sm text-neutral-500 tabular-nums">
-        {plan.ambition} · {planned} of 64 actions planned · {done} done
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Open Window 64
+          </h1>
+          <p className="mt-1 max-w-[80ch] text-sm text-neutral-500 tabular-nums">
+            {plan.ambition} · {planned} of 64 actions planned · {done} done
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={exportAsImage}
+          disabled={exporting}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm font-medium ring-1 ring-neutral-950/10 hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50"
+        >
+          <ArrowDownTrayIcon className="size-4 text-neutral-400" />
+          {exporting ? 'Exporting…' : 'Export as image'}
+        </button>
+      </div>
 
       <div className="mt-8 overflow-x-auto">
-        <div className="grid min-w-[44rem] grid-cols-3 gap-(--padding) rounded-(--radius) bg-neutral-50 p-(--padding) [--padding:--spacing(1.5)] [--radius:var(--radius-2xl)]">
+        <div
+          ref={gridRef}
+          className="grid min-w-[44rem] grid-cols-3 gap-(--padding) rounded-(--radius) bg-neutral-50 p-(--padding) [--padding:--spacing(1.5)] [--radius:var(--radius-2xl)]"
+        >
           {RING.map((blockIndex) =>
             blockIndex === -1 ? (
               <CenterBlock key="center" plan={plan} />
